@@ -9,20 +9,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ---
-syncID: 040aa4e32b574a7dac2bf2f88ea86858
-title: "Interacting with the PhenoCam Server using phenocamapi R Package"
-description: "Learn the basics of how to extract PhenoCam data and metadata through the Phenocam API"
-date: "`r Sys.Date()`"
-authors: Bijan Seyednasrollah
-contributors:
-estimatedTime: 0.5 hrs
-packagesLibraries: phenocamapi, data.table, lubridate, jpeg
-topics: remote-sensing, phenology, time-series, data-analysis
-languagesTool: R
-dataProduct: DP1.00033.001, DP1.00042.001, DP1.20002.001
-code1: https://raw.githubusercontent.com/NEONScience/NEON-Data-Skills/main/tutorials/R/Phenocam/phenocam-tools/getting-started-phenocamapi/getting-started-phenocamapi.R
-tutorialSeries: phenocam-intro
-urlTitle: phenocam-api-intro
+
+# Purpose 
+This interactive part of the workshop will walk participants through interacting with the PhenoCam Server using phenocamapi and phenocamr R Package. Participants will learn the basics of extracting PhenoCam data and metadata and how to work with that data through these packages. This code was adopted from code by Bijan Seyednasrollah and Koen Hufkens.  
 ---
 
 ```{r setup, include = FALSE}
@@ -32,27 +21,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-The <a href="https://cran.r-project.org/web/packages/phenocamapi/index.html" target="_blank"> *phenocamapi* R package</a> 
-is developed to simplify interacting with the 
-<a href="https://phenocam.sr.unh.edu" target="_blank">PhenoCam network</a> 
-dataset and perform data wrangling steps on PhenoCam sites' data and metadata.
 
-This tutorial will show you the basic commands for accessing PhenoCam data
-through the PhenoCam API. The *phenocampapi* R package is developed and maintained by 
-<a href="https://bnasr.github.io/" target="_blank">Bijan Seyednarollah</a>. 
-The most recent release is available on GitHub (<a href="https://github.com/bnasr/phenocamapi" target="_blank">PhenocamAPI</a>). 
-<a href="https://github.com/bnasr/phenocamapi/tree/master/vignettes" target ="_blank">Additional vignettes</a> 
-can be found on how to merge external time-series (e.g. Flux data) with the 
-PhenoCam time-series. 
+We will begin with several useful skills and tools for extracting PhenoCam data 
+directly from the server. The goals of this portion of the workshop are to:
 
-We begin with several useful skills and tools for extracting PhenoCam data 
-directly from the server:
-
-- Exploring the PhenoCam metadata
-- Filtering the dataset by site attributes
-- Downloading PhenoCam time-series data
-- Extracting the list of midday images
-- Downloading midday images for a given time range
+- Explore the PhenoCam metadata
+- Filter the dataset by site attributes
+- Download PhenoCam time-series data
+- Extract the list of midday images
+- Download midday images for a given time range
+- Extract and plot the phenophases from a site of interest. 
 
 ## Exploring PhenoCam metadata
 
@@ -195,7 +173,6 @@ colnames(rois)
 
 # view first few regions of of interest (ROI) locations
 head(rois$roi_name)
-
 ```
 
 ### Download time series
@@ -353,12 +330,26 @@ Now that we have our dataframe, we will want to detect any outliers in our data 
 ```
 
 # Calculating the Phenophases
-Now that the smoothed data has been made available, we can calculate the phenological transition dates 
+Now that the smoothed data has been made available, we can calculate and plot the phenological transition date.
+```{r}
+phenology_dates <- phenophases(df, internal = TRUE)
+
+plot(as.Date(df$data$date),
+     df$data$smooth_gcc_90,
+     type = "l",
+     xlab = "date",
+     ylab = "Gcc")
+
+# rising "spring" greenup dates
+abline(v = phenology_dates$rising$transition_50,
+       col = "forestgreen")
+
+# falling "autumn" senescence dates
+abline(v = phenology_dates$falling$transition_50,
+       col = "brown4")
+```
+
 
 
 *** 
 
-The *phenocamapi* R package is developed and maintained by 
-<a href="https://bnasr.github.io/">Bijan Seyednarollah</a>. 
-The most recent release is available from 
-<a href="https://github.com/bnasr/phenocamapi" target="_blank">https://github.com/bnasr/phenocamapi</a>.
