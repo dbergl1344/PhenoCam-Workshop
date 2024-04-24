@@ -8,11 +8,7 @@ date: "2024-04-05"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
----
 
-# Purpose 
-This interactive part of the workshop will walk participants through interacting with the PhenoCam Server using phenocamapi and phenocamr R Package. Participants will learn the basics of extracting PhenoCam data and metadata and how to work with that data through these packages. This code was adopted from code by Bijan Seyednasrollah and Koen Hufkens.  
----
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -21,14 +17,18 @@ knitr::opts_chunk$set(
 )
 ```
 
+---
+
+# Purpose 
+This interactive part of the workshop will walk participants through interacting with the PhenoCam Server using phenocamapi and phenocamr R Package. Participants will learn the basics of extracting PhenoCam data and metadata and how to work with that data through these packages. This code was adopted from code by Bijan Seyednasrollah and Koen Hufkens.  
+
+---
 
 We will begin with several useful skills and tools for extracting PhenoCam data 
 directly from the server. The goals of this portion of the workshop are to:
 
 - Explore the PhenoCam metadata
-- Filter the dataset by site attributes
 - Download PhenoCam time-series data
-- Extract the list of midday images
 - Download midday images for a given time range
 - Extract and plot the phenophases from a site of interest. 
 
@@ -37,11 +37,10 @@ directly from the server. The goals of this portion of the workshop are to:
 Each PhenoCam site has specific metadata including but not limited to how a site 
 is set up and where it is located, what vegetation type is visible from the 
 camera, and its climate regime. Each PhenoCam may have zero to several Regions 
-of Interest (ROIs) per vegetation type. The *phenocamapi* package is an 
-interface to interact with the PhenoCam server to extract those data and 
-process them in an R environment.
+of Interest (ROIs) per vegetation type. The packages that we will use today allow us to interact with the PhenoCam server to extract PhenoCam data and 
+process that data in an R environment.
 
-To explore the PhenoCam data, we'll use several packages for this tutorial. 
+Let's bring in the packages that we will be using!
 
 ```{r libraries}
 if(!require(devtools)) install.packages('devtools')
@@ -75,7 +74,7 @@ Phenocams.
 ### Remove null values
 
 We may want to explore some of the patterns in the metadata before we jump into
-specific locations. Let's look at Mean Annual Precipitation (MAP) and Mean Annual Temperature (MAT) across the different field site and classify those by the primary vegetation type ('primary_veg_type') for each site. 
+specific locations. Let's look at Mean Annual Precipitation (MAP) and Mean Annual Temperature (MAT) across the different field site and classify those by the primary vegetation type ('primary_veg_type') for each site. First we need to identify the abbreviations that are used for the functions that we will be using next. We will use the table below to do this.
 
 | Abbreviation |	Description |
 |----------|:-------------:|------:|
@@ -93,7 +92,7 @@ specific locations. Let's look at Mean Annual Precipitation (MAP) and Mean Annua
 | RF |	reference panel | 	 
 | XX |	unspecified |
 
-To do this we'd first want to remove the sites where there is not data and then 
+First, we want to remove the sites where there is not MAP and MET as part of the metadata, and then 
 plot the data. 
 
 ```{r plot-MAT-MAP, message=FALSE, fig.height=8, fig.width=8}
@@ -120,14 +119,12 @@ legend('topleft', legend = c('DB','DN', 'EN','EB','AG', 'SH'),
 
 ## PhenoCam time series
 
-PhenoCam time series are extracted time series data obtained from regions of interest (ROI's) for a given site. First we have to obtain the ROIs.
+PhenoCam time series are extracted time series data obtained from regions of interest (ROI's) for a given site. First we have to obtain the ROIs. 
 
 ### Obtain ROIs
 To download the phenological time series from the PhenoCam, we need to know the 
 site name, vegetation type and ROI ID. This information can be obtained from each
-specific PhenoCam page on the 
-<a href="https://phenocam.sr.unh.edu/webcam/gallery/" target="_blank">PhenoCam website</a> 
-or by using the `get_rois()` function. 
+specific PhenoCam page by using the `get_rois()` function from the phenocamapi package. 
 
 
 ```{r get-rois, fig.height=5, fig.width=6.5, message=FALSE}
@@ -143,13 +140,9 @@ head(rois$roi_name)
 
 ### Download time series
 
-The `get_pheno_ts()` function can download a time series and return the result 
+Now that we have our ROI data frame, we can use the `get_pheno_ts()` function to download a time series of our site within that region of interest and return the result 
 as a `data.table`. 
-Let's work with the 
-<a href="https://phenocam.sr.unh.edu/data/archive/dukehw/ROI/dukehw_DB_1000.html">Duke Forest Hardwood Stand (`dukehw`) PhenoCam</a> 
-and specifically the ROI 
-<a href="https://phenocam.sr.unh.edu/data/archive/dukehw/ROI/dukehw_DB_1000.html">`DB_1000`</a> 
-we can run the following code. 
+We will work with the Duke Forest Hardwood Stand ('dukehw') and the ROI == 1000. 
 
 ```{r, fig.height=5, fig.width=6.5, message=FALSE}
 # list ROIs for dukehw
@@ -164,16 +157,9 @@ str(dukehw_DB_1000)
 ```
 
 We now have a variety of data related to this ROI from the Hardwood Stand at Duke 
-Forest. 
+Forest. One of those is the green chromatic coordinate. This is a measure of "greenness" of an area and is an indicator of the green pigment in vegetation.
 
-Green Chromatic Coordinate (GCC) is a measure of "greenness" of an area and is
-widely used in Phenocam images as an indicator of the green pigment in vegetation.
-Let's use this measure to look at changes in GCC over time at this site. Looking 
-back at the available data, we have several options for GCC. `gcc90` is the 90th 
-quantile of GCC in the pixels across the ROI (for more details, 
-<a href="https://daac.ornl.gov/VEGETATION/guides/PhenoCam_V1.html" target="_blank"> PhenoCam v1 description</a>). 
-We'll use this as it tracks the upper greenness values while not including many 
-outliers.  
+We can use this to measure changes in GCC or greeness over time at this site. We will use what's called `gcc90`, which is the the 90th quantile of GCC in the pixels across the ROI. The 90th quantile tracks the upper greenness values while not including many outliers.  
 
 Before we can plot `gcc-90` we do need to fix our dates and convert them from 
 Factors to Date to correctly plot. 
@@ -191,10 +177,7 @@ mtext('Duke Forest, Hardwood', font = 2)
 
 ### Download midday images for a given time range
 
-Now we can access all the midday images and download them one at a time. However,
-we frequently want all the images within a specific time range of interest. We'll
-learn how to do that next. 
-
+But now let's say we want to actually "peak" into our forest. To do this we can access all the midday images and download them one at a time. However, we frequently want all the images within a specific time range of interest. We can do that using the the phenocamapi package. 
 ```{r midday-time-range, fig.height=6, fig.width=8, message=FALSE, eval=TRUE}
 
 # open a temporary directory
@@ -214,7 +197,7 @@ head(duke_middays_path)
 
 ```
 
-We can demonstrate the seasonality of Duke forest observed from the camera. (Note
+And with these images, we can demonstrate the seasonality of Duke forest observed from the camera. (Note
 this code may take a while to run through the loop).
 ```{r plot-monthly-forest, fig.height=6, fig.width=8, message=FALSE, eval=TRUE}
 n <- length(duke_middays_path)
@@ -231,9 +214,7 @@ mtext('Seasonal variation of forest at Duke Hardwood Forest', font = 2, outer = 
 ```
 
 # Phenology Transition Dates
-The goal of this section was to show how to download a limited number of midday images from the PhenoCam server. However, more extensive datasets should be downloaded from the <a href="https://phenocam.sr.unh.edu/webcam/network/download/"> PhenoCam </a>.
-
-Now what if we want to see rising and falling of the seasons on a plot through time? This let's us visualize how the phenology might have changed through time in an ecosystem. To do this, we can use the phenocamr package. The phenphases() function in the phenocamr package, but first let's download the duke forest data using this package.
+Okay, great! We just visualized an entire growing season through PhenoCam images. But now what if we want to see if this growing season has been changing through time? Or track if start of sesaon, end of season, or greeness has changed through time? We can use the phenocamr package to visualize this. The phenphases() function in the phenocamr package will extract the start of spring and end of fall dates. First let's download the duke forest data using this package.
 
 ```{r}
  download_phenocam(site = "dukehw",
@@ -251,7 +232,7 @@ df <- read_phenocam(file.path(tempdir(),"dukehw_DB_1000_3day.csv"))
 
 # Detecting Outliers and Smoothing the Time Series
 
-Now that we have our dataframe, we will want to detect any outliers in our data and smooth the time series 
+Now that we have our dataframe, we will want to detect any outliers in our data and smooth the time series. 
 ```{r}
   df <- detect_outliers(df)
   df <- smooth_ts(df)
