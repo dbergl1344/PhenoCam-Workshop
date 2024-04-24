@@ -81,11 +81,11 @@ mydf <- mydf[!((MAT_worldclim == -9999)|(MAP_worldclim == -9999))]
 
 # Making a plot showing all sites by their vegetation type (represented as different symbols and colors) plotting across climate (MAT and MAP) space. Refer to table to identify vegetation type acronyms.
 
-mydf[primary_veg_type=='InsertVegetationAbbreviationFromTable', plot(MAT_worldclim, MAP_worldclim, pch = 19, col = 'green', xlim = c(-5, 27), ylim = c(0, 4000))]
-mydf[primary_veg_type=='InsertVegetationAbbreviationFromTable', points(MAT_worldclim, MAP_worldclim, pch = 1, col = 'darkgreen')]
+mydf[primary_veg_type=='EB', plot(MAT_worldclim, MAP_worldclim, pch = 19, col = 'green', xlim = c(-5, 27), ylim = c(0, 4000))]
+mydf[primary_veg_type=='DB', points(MAT_worldclim, MAP_worldclim, pch = 1, col = 'darkgreen')]
 
 
-legend('topleft', legend = c('InsertVegetationAbbreviationFromTable','InsertVegetationAbbreviationFromTable'), 
+legend('topleft', legend = c('EB','DB'), 
        pch = c(19, 1), 
        col =  c('green', 'darkgreen'))
 
@@ -125,10 +125,10 @@ Great! Now you have selected a site that has an roiName ending in _1000. For exa
 
 ```{r, fig.height=5, fig.width=6.5, message=FALSE}
 # list ROIs for dukehw
-myrois[site=='InsertSiteName',]
+myrois[site=='anisclo',]
 
 # Obtain the decidous broadleaf, ROI ID 1000 data from the dukehw phenocam
-mysite_DB_1000 <- get_pheno_ts(site = 'InsertSiteName', vegType = 'InsertVegetationType', roiID = 1000, type = '3day')
+mysite_DB_1000 <- get_pheno_ts(site = 'anisclo', vegType = 'EB', roiID = 1000, type = '3day')
 
 # Produces a list of the dukehw data variables
 str(mysite_DB_1000)
@@ -159,7 +159,7 @@ mtext('My Site GCC', font = 2)
 
 Now we can access all the midday images and download them one at a time. However,
 we frequently want all the images within a specific time range of interest. We'll
-learn how to do that next. Replace 'MySiteName' with the name of the site you selected above. Feel free to adjust the y = '2017' to a different year or months = '1:12' if you do not want to include all 12 months, or days = '15' if you want to choose a different day of the month. Once you have made these adjustments, you can run the code chunk below. Note: If y = 2017 does not work, replace this with y = '2023'. 
+learn how to do that next. Replace 'MySiteName' with the name of the site you selected above. Feel free to adjust the y = '2017' to a different year or months = '1:12' if you do not want to include all 12 months, or days = '15' if you want to choose a different day of the month. Once you have made these adjustments, you can run the code chunk below. 
 
 ```{r midday-time-range, fig.height=6, fig.width=8, message=FALSE, eval=TRUE}
 
@@ -167,14 +167,14 @@ learn how to do that next. Replace 'MySiteName' with the name of the site you se
 tmp_dir <- tempdir()
 
 # download a subset. Example dukehw 2017
-download_midday_images(site = 'MySiteName', # which site
-                       y = 2017, # which year(s)
+download_midday_images(site = 'anisclo', # which site
+                       y = 2023, # which year(s)
                        months = 1:12, # which month(s)
                        days = 15, # which days on month(s)
                        download_dir = tmp_dir) # where on your computer
 
 # list of downloaded files
-mysite_middays_path <- dir(tmp_dir, pattern = 'MySiteName', full.names = TRUE)
+mysite_middays_path <- dir(tmp_dir, pattern = 'anisclo', full.names = TRUE)
 
 head(mysite_middays_path)
 
@@ -205,8 +205,8 @@ mtext('Seasonal variation from my site', font = 2, outer = TRUE)
 Now let's explore the GCC, rising, and falling of the seasons on a plot through time. This let's us visualize how the phenology might have changed through time in an ecosystem. To do this, we can use the phenocamr package. We will use the phenphases() function in the phenocamr package, but first let's download data frame the site that you have been working with in this exercise. Replace "MySiteName" with the name of your site that you selected. You will also want to replace "MyVegetationTypeAbbreviation" with your vegetation type abbrevation that corresponds to your site. Now run the code.
 
 ```{r}
- download_phenocam(site = "MySiteName",
-                    veg_type = "MyVegetationTypeAbbreviation",
+ download_phenocam(site = "anisclo",
+                    veg_type = "EB",
                     roi_id = "1000",
                     frequency = 3,
                     outlier_detection = FALSE,
@@ -220,7 +220,7 @@ You will now want to put the data that you just downloaded into a data.table. To
 
 ```{r}
 #Now we need to assign a dataframe to the data that we just downloaded
-dfphenophases <- read_phenocam(file.path(tempdir(),"MySiteName_MyVegetationAbbreviation_1000_3day.csv"))
+dfphenophases <- read_phenocam(file.path(tempdir(),"anisclo_EB_1000_3day.csv"))
 ```
 
 
