@@ -43,12 +43,11 @@ process that data in an R environment.
 Let's bring in the packages that we will be using!
 
 ```{r libraries}
-if(!require(devtools)) install.packages('devtools')
-devtools::install_github('bnasr/phenocamapi')
 library(data.table) #installs package that creates a data frame for visualizing data in row-column table format
 library(phenocamapi)  #installs packages of time series and phenocam data from the Phenology Network. Loads required packages rjson, bitops and RCurl
 library(lubridate)  #install time series data package
 library(jpeg)
+library(phenocamr)
 ```
 
 

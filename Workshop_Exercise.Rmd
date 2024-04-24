@@ -21,9 +21,6 @@ knitr::opts_chunk$set(
 In this part of the workshop, you will select your own site to explore. First, we need to install and load the appropriate libraries. Run the chunk of code below to do this.
 
 ```{r libraries}
-if(!require(devtools)) install.packages('devtools')
-devtools::install_github('bnasr/phenocamapi')
-install.packages("phenocamr")
 library(data.table) #installs package that creates a data frame for visualizing data in row-column table format
 library(phenocamapi)  #installs packages of time series and phenocam data from the Phenology Network. Loads required packages rjson, bitops and RCurl
 library(lubridate)  #install time series data package
