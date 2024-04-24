@@ -117,44 +117,10 @@ legend('topleft', legend = c('DB','DN', 'EN','EB','AG', 'SH'),
 ```
 
 
-### Filtering using attributes
-
-Alternatively, we may want to only include Phenocams with certain attributes in
-our datasets. For example, we may be interested only in sites with a co-located
-flux tower. For this, we'd want to filter for those with a flux tower using the
-`flux_sitenames` attribute in the metadata. 
-
-
-```{r filter-flux, fig.height=5, fig.width=6.5, message=FALSE}
-# Create a data table only including the sites that have flux_data available and where the FLUX site name is specified
-phenofluxsites <- phenos[flux_data==TRUE&!is.na(flux_sitenames)&flux_sitenames!='', 
-                         .(PhenoCam=site, Flux=flux_sitenames)] # return as table
-
-#Specify to retain variables of Phenocam site and their flux tower name
-phenofluxsites <- phenofluxsites[Flux!='']
-
-# view the first few rows of the data table
-head(phenofluxsites)
-
-```
-
-We could further identify which of those Phenocams with a flux tower and in 
-deciduous broadleaf forests (`primary_veg_type=='DB'`). 
-
-```{r filter-flux-db, fig.height=5, fig.width=6.5, message=FALSE}
-
-#list deciduous broadleaf sites with a flux tower
-DB.flux <- phenos[flux_data==TRUE&primary_veg_type=='DB', 
-                  site]  # return just the site names as a list
-
-# see the first few rows
-head(DB.flux)
-```
-
 
 ## PhenoCam time series
 
-PhenoCam time series are extracted time series data obtained from regions of interest (ROI's) for a given site. 
+PhenoCam time series are extracted time series data obtained from regions of interest (ROI's) for a given site. First we have to obtain the ROIs.
 
 ### Obtain ROIs
 To download the phenological time series from the PhenoCam, we need to know the 
@@ -207,7 +173,7 @@ back at the available data, we have several options for GCC. `gcc90` is the 90th
 quantile of GCC in the pixels across the ROI (for more details, 
 <a href="https://daac.ornl.gov/VEGETATION/guides/PhenoCam_V1.html" target="_blank"> PhenoCam v1 description</a>). 
 We'll use this as it tracks the upper greenness values while not including many 
-outliners.  
+outliers.  
 
 Before we can plot `gcc-90` we do need to fix our dates and convert them from 
 Factors to Date to correctly plot. 
@@ -220,44 +186,6 @@ dukehw_DB_1000[,date:=as.Date(date)]
 dukehw_DB_1000[,plot(date, gcc_90, col = 'green', type = 'b')]
 mtext('Duke Forest, Hardwood', font = 2)
 
-```
-
-
-## Download midday images
-
-While PhenoCam sites may have many images in a given day, many simple analyses
-can use just the midday image when the sun is most directly overhead the canopy. 
-Therefore, extracting a list of midday images (only one image a day) can be useful. 
-
-
-```{r midday-list, fig.height=5, fig.width=8, message=FALSE}
-
-# obtaining midday_images for dukehw
-duke_middays <- get_midday_list('dukehw')
-
-# see the first few rows
-head(duke_middays)
-
-```
-
-Now we have a list of all the midday images from this Phenocam. Let's download
-them and plot 
-
-```{r midday-download, fig.height=5, fig.width=8}
-# download a file
-destfile <- tempfile(fileext = '.jpg')
-
-# download only the first available file
-# modify the `[1]` to download other images
-download.file(duke_middays[1], destfile = destfile, mode = 'wb')
-
-# plot the image
-img <- try(readJPEG(destfile))
-if(class(img)!='try-error'){
-  par(mar= c(0,0,0,0))
-  plot(0:1,0:1, type='n', axes= FALSE, xlab= '', ylab = '')
-  rasterImage(img, 0, 0, 1, 1)
-}
 ```
 
 
