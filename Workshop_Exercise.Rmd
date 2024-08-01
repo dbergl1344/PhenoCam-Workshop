@@ -161,11 +161,11 @@ columns.
 
 [Look at the data table from above and select a site from the site
 column that ends in the \_1000 suffix and gather the roitype and
-roi_name information for that site.]{style="color:red"} It may be better
-to choose a site that is active, where active is TRUE. Once you have
-selected your site, [replace the \$roi_name, $site, and$roitype in the
-code below with the actual site name, roi type, and roi
-name.]{style="color:red"}
+roi_name information for that site.]{style="color:green"} It may be
+better to choose a site that is active, where active is TRUE. Once you
+have selected your site, [replace the \$roi_name, $site, and$roitype in
+the code below with the actual site name, roi type, and roi
+name.]{style="color:green"}
 
 Once you have done this, you can now [run]{style="color:green"} the code
 chunk below.
