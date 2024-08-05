@@ -22,11 +22,11 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-This interactive part of the workshop will walk participants through
-interacting with the PhenoCam Server using phenocamapi and phenocamr R
-Package. Participants will learn the basics of extracting PhenoCam data
-and metadata and how to work with that data through these packages. This
-code was adopted from code by Bijan Seyednasrollah and Koen Hufkens.
+This interactive part of the workshop will walk us through interacting
+with the PhenoCam Server using phenocamapi and phenocamr R Package. You
+will learn the basics of extracting PhenoCam data and metadata and how
+to work with that data through these packages. This code was adopted
+from code by Bijan Seyednasrollah and Koen Hufkens.
 
 ------------------------------------------------------------------------
 
@@ -43,11 +43,12 @@ workshop are to:
 
 Each PhenoCam site has specific metadata including but not limited to
 how a site is set up and where it is located, what vegetation type is
-visible from the camera, and its climate regime. Each PhenoCam may have
-zero to several Regions of Interest (ROIs) per vegetation type. The
-packages that we will use today allow us to interact with the PhenoCam
-server to extract PhenoCam data and process that data in an R
-environment.
+visible from the camera, and its climate regime.
+
+Each PhenoCam may have zero to several Regions of Interest (ROIs) per
+vegetation type. The packages that we will use today allow us to
+interact with the PhenoCam server to extract PhenoCam data and process
+that data in an R environment.
 
 Let's bring in the packages that we will be using!
 
