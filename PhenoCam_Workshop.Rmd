@@ -23,9 +23,9 @@ knitr::opts_chunk$set(
 # Purpose
 
 This interactive part of the workshop will walk us through interacting
-with the PhenoCam Server using phenocamapi and phenocamr R Package. You
-will learn the basics of extracting PhenoCam data and metadata and how
-to work with that data through these packages. This code was adopted
+with the PhenoCam Server using the phenocamapi and phenocamr R packages.
+You will learn the basics of extracting PhenoCam data and metadata and
+how to work with that data through these packages. This code was adopted
 from code by Bijan Seyednasrollah and Koen Hufkens.
 
 ------------------------------------------------------------------------
@@ -60,7 +60,7 @@ library(jpeg)
 library(phenocamr)
 ```
 
-We can obtain an up-to-date `data.frame` of the metadata of the entire
+We can obtain an up-to-date `data.frame` of the metadata for the entire
 PhenoCam network using the `get_phenos()` function. The returning value
 would be a `data.table` in order to simplify further data exploration.
 
@@ -83,7 +83,7 @@ for the Phenocams.
 
 We may want to explore some of the patterns in the metadata before we
 jump into specific locations. Let's look at Mean Annual Precipitation
-(MAP) and Mean Annual Temperature (MAT) across the different field site
+(MAP) and Mean Annual Temperature (MAT) across the different field sites
 and classify those by the primary vegetation type ('primary_veg_type')
 for each site. First we need to identify the abbreviations that are used
 for the functions that we will be using next. We will use the table
@@ -105,7 +105,7 @@ below to do this.
 | RF           |                   reference panel                   |     |
 | XX           |                     unspecified                     |     |
 
-First, we want to remove the sites where there is not MAP and MET as
+First, we want to remove the sites where there is not MAP and MAT as
 part of the metadata, and then plot the data.
 
 ```{r plot-MAT-MAP, message=FALSE, fig.height=8, fig.width=8}
@@ -138,8 +138,8 @@ the ROIs.
 
 To download the phenological time series from the PhenoCam, we need to
 know the site name, vegetation type and ROI ID. This information can be
-obtained from each specific PhenoCam page by using the `get_rois()`
-function from the phenocamapi package.
+obtained from each PhenoCam site by using the `get_rois()` function from
+the phenocamapi package.
 
 ```{r get-rois, fig.height=5, fig.width=6.5, message=FALSE}
 # Obtaining the list of all the available regions of interest (ROI's) on the PhenoCam server and producing a data table
@@ -163,7 +163,7 @@ Duke Forest Hardwood Stand ('dukehw') and the ROI == 1000.
 # list ROIs for dukehw
 rois[site=='dukehw',]
 
-# Obtain the decidous broadleaf, ROI ID 1000 data from the dukehw phenocam
+# Obtain the deciduous broadleaf, ROI ID 1000 data from the dukehw phenocam
 dukehw_DB_1000 <- get_pheno_ts(site = 'dukehw', vegType = 'DB', roiID = 1000, type = '3day')
 
 # Produces a list of the dukehw data variables
@@ -173,13 +173,14 @@ str(dukehw_DB_1000)
 
 We now have a variety of data related to this ROI from the Hardwood
 Stand at Duke Forest. One of those is the green chromatic coordinate.
-This is a measure of "greenness" of an area and is an indicator of the
-green pigment in vegetation.
+This is a measure of the "greenness" of an area and is an indicator of
+the green pigment in vegetation.
 
-We can use this to measure changes in GCC or greeness over time at this
-site. We will use what's called `gcc90`, which is the the 90th quantile
-of GCC in the pixels across the ROI. The 90th quantile tracks the upper
-greenness values while not including many outliers.
+We can use this to measure changes in GCC or greenness over time at this
+site. We will use what's called `gcc90`, which is the 90th percentile
+GCC value calculated across a 3-day moving window for a ROI. The 90th
+quantile tracks the upper greenness values while not including many
+outliers.
 
 Before we can plot `gcc-90` we do need to fix our dates and convert them
 from Factors to Date to correctly plot.
@@ -242,11 +243,11 @@ mtext('Seasonal variation of forest at Duke Hardwood Forest', font = 2, outer = 
 
 Okay, great! We just visualized an entire growing season through
 PhenoCam images. But now what if we want to see if this growing season
-has been changing through time? Or track if start of sesaon, end of
-season, or greeness has changed through time? We can use the phenocamr
-package to visualize this. The phenphases() function in the phenocamr
-package will extract the start of spring and end of fall dates. First
-let's download the duke forest data using this package.
+has been changing over time? Or track whether the start of season, end
+of season, or greeness has changed through time? We can use the
+phenocamr package to visualize this. The phenphases() function in the
+phenocamr package will extract the start of spring and end of fall
+dates. First, let's download the Duke Forest data using this package.
 
 ```{r}
  download_phenocam(site = "dukehw",
