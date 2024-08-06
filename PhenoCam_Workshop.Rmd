@@ -37,7 +37,7 @@ workshop are to:
 -   Explore the PhenoCam metadata
 -   Download PhenoCam time-series data
 -   Download midday images for a given time range
--   Extract and plot the phenophases from a site of interest.
+-   Extract and plot the phenophases from a site of interest
 
 ## Exploring PhenoCam metadata
 
@@ -45,7 +45,7 @@ Each PhenoCam site has specific metadata including but not limited to
 how a site is set up and where it is located, what vegetation type is
 visible from the camera, and its climate regime.
 
-Each PhenoCam may have zero to several Regions of Interest (ROIs) per
+Each PhenoCam may have one to several Regions of Interest (ROIs) per
 vegetation type. The packages that we will use today allow us to
 interact with the PhenoCam server to extract PhenoCam data and process
 that data in an R environment.
@@ -54,7 +54,7 @@ Let's bring in the packages that we will be using!
 
 ```{r libraries}
 library(data.table) #installs package that creates a data frame for visualizing data in row-column table format
-library(phenocamapi)  #installs packages of time series and phenocam data from the Phenology Network. Loads required packages rjson, bitops and RCurl
+library(phenocamapi) #installs packages of time series and phenocam data from the Phenology Network. Loads required packages rjson, bitops and RCurl
 library(lubridate)  #install time series data package
 library(jpeg)
 library(phenocamr)
@@ -143,7 +143,7 @@ the phenocamapi package.
 
 ```{r get-rois, fig.height=5, fig.width=6.5, message=FALSE}
 # Obtaining the list of all the available regions of interest (ROI's) on the PhenoCam server and producing a data table
-rois <- get_rois()
+# rois <- get_rois()
 
 # view the data variables in the data table
 colnames(rois)
