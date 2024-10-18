@@ -38,6 +38,7 @@ workshop are to:
 -   Download PhenoCam time-series data
 -   Download midday images for a given time range
 -   Extract and plot the phenophases from a site of interest
+-   Link Flux data to PhenoCam data
 
 ## Exploring PhenoCam metadata
 
@@ -58,6 +59,9 @@ library(phenocamapi) #installs packages of time series and phenocam data from th
 library(lubridate)  #install time series data package
 library(jpeg)
 library(phenocamr)
+library(ggplot2)
+library(plotly)
+library(gridExtra)
 ```
 
 We can obtain an up-to-date `data.frame` of the metadata for the entire
@@ -239,6 +243,103 @@ mtext('Seasonal variation of forest at Duke Hardwood Forest', font = 2, outer = 
 
 ```
 
+# How can we connect flux data to PhenoCam data?
+
+### We can filter using attributes
+
+Alternatively, we may want to only include PhenoCam sites with certain
+attributes in our datasets. For example, we may be interested only in
+sites with a co-located flux tower. For this, we'd want to filter for
+those with a flux tower using the `flux_sitenames` attribute in the
+metadata.
+
+```{r filter-flux, fig.height=5, fig.width=6.5, message=FALSE}
+# Create a data table only including the sites that have flux_data available and where the FLUX site name is specified
+phenofluxsites <- phenos[flux_data==TRUE&!is.na(flux_sitenames)&flux_sitenames!='',.(PhenoCam=site, Flux=flux_sitenames)] # return as table
+
+#Specify to retain variables of Phenocam site and their flux tower name
+phenofluxsites <- phenofluxsites[Flux!='']
+
+# view the first few rows of the data table
+head(phenofluxsites)
+
+```
+
+What if we are interested PhenoCam data and Flux data that is co-located
+within a specific vegetation type? We can do that! We could further
+identify which of those Phenocams with a flux tower and in deciduous
+broadleaf forests (`primary_veg_type=='DB'`).
+
+```{r filter-flux-db, fig.height=5, fig.width=6.5, message=FALSE}
+
+#list deciduous broadleaf sites with a flux tower
+DB.flux <- phenos[flux_data==TRUE&primary_veg_type=='DB', 
+                  site]  # return just the site names as a list
+
+# see the first few rows
+head(DB.flux)
+```
+
+```{r}
+# Here we will have already needed to download Flux data that you process or that is already proccessed. You can use packages like amerifluxR to do this. Here we are going to work with the Bartlett site that has both PhenoCam data colacated with a EC flux tower. We will focus on the year 2018. 
+# Merge the datasets by site and date
+
+head(Bart_2018)
+
+# Download PhenoCam time series for the Bartlett site in 2018
+bartlett_pheno_2018 <- get_pheno_ts(site = 'bartlettir', vegType = 'DB', roiID = 2000, type = '3day')
+
+# Convert date to proper format
+bartlett_pheno_2018[, date := as.Date(date)]
+
+# Filter PhenoCam data for the year 2018
+bartlett_pheno_2018_2018 <- bartlett_pheno_2018[year(date) == 2018]
+
+# View the first few rows of the PhenoCam data
+head(bartlett_pheno_2018_2018)
+
+# Add a date column to the Bartlett flux data (by extracting just the date part from DateTime)
+Bart_2018$date <- as.Date(Bart_2018$DateTime)
+
+# Merge the PhenoCam data with the Bartlett flux data by date
+merged_fluxPhenodata <- merge(bartlett_pheno_2018_2018, Bart_2018, by = "date")
+
+# View the first few rows of the merged data
+head(merged_fluxPhenodata)
+
+# Create a new column for Day of Year (DOY) to explore seasonality
+merged_fluxPhenodata$doy <- yday(merged_fluxPhenodata$date)
+
+# Replace negative GPP values with 0
+merged_fluxPhenodata <- merged_fluxPhenodata %>%
+  mutate(GPPU50 = ifelse(GPPU50 < 0, 0, GPPU50))
+
+# Plot 1: GCC across the year (DOY)
+plot_gcc <- ggplot(merged_fluxPhenodata, aes(x = doy)) +
+  geom_line(aes(y = gcc_90), color = "green") +
+  labs(title = "Seasonal Patterns: GCC", x = "Day of Year (DOY)", y = "GCC 90th Percentile") +
+  theme_minimal()
+
+# Plot 2: GPP across the year (DOY) with negative GPP set to zero
+plot_gpp <- ggplot(merged_fluxPhenodata, aes(x = doy)) +
+  geom_line(aes(y = GPPU50), color = "blue", linetype = "dashed") +
+  labs(title = "Seasonal Patterns: GPP (Negative GPP as Zero)", x = "Day of Year (DOY)", y = "GPP (µmol m^-2 s^-1)") +
+  theme_minimal()
+
+# Combine the two plots into a grid
+grid.arrange(plot_gcc, plot_gpp, nrow = 2)
+
+# Create an interactive scatter plot with plotly
+p <- ggplot(merged_fluxPhenodata, aes(x = gcc_90, y = GPPU50)) +
+  geom_point(color = "green") +
+  labs(title = "Interactive GCC vs GPP", x = "GCC 90th Percentile", y = "GPP (µmol m^-2 s^-1)") +
+  theme_minimal()
+
+ggplotly(p)
+
+
+```
+
 # Phenology Transition Dates
 
 Okay, great! We just visualized an entire growing season through
@@ -293,6 +394,74 @@ abline(v = phenology_dates$rising$transition_50,
 # falling "autumn" senescence dates
 abline(v = phenology_dates$falling$transition_50,
        col = "brown4")
+```
+
+```{r}
+# Assuming we already have Bartlett PhenoCam data loaded and processed
+# Bartlett PhenoCam data already exists in 'merged_fluxPhenodata'
+
+# Step 1: Download and assign Bartlett PhenoCam data (if not already downloaded)
+# If Bartlett data isn't available, use the download function below
+
+Bart <- download_phenocam(site = "bartlettir", veg_type = "DB", roi_id = "2000", frequency = 3, out_dir = tempdir())
+
+dfBart <- read_phenocam(file.path(tempdir(), "bartlettir_DB_2000_3day.csv"))
+
+# Step 2: Detect outliers and smooth the time series
+dfBart <- detect_outliers(dfBart)
+dfBart <- smooth_ts(dfBart)
+
+# Step 3: Calculate phenophases for the Bartlett data
+phenology_datesBart <- phenophases(dfBart, internal = TRUE)
+dfBart <- as.Date(dfBart$data$date)
+# View phenology transition dates
+phenology_datesBart$rising
+phenology_datesBart$falling
+
+# Step 4: Plot GPP and overlay phenophases (transitions at 10%, 25%, 50%) on top of GPP
+
+# Plot GPP over time
+# Assuming GPP data is already in 'merged_fluxPhenodata'
+# Convert the date column to Date format if it's not already
+merged_fluxPhenodata$date <- as.Date(merged_fluxPhenodata$date)
+
+# Plot GPP over time
+plot(as.Date(merged_fluxPhenodata$date),
+     merged_fluxPhenodata$GPPU50,
+     type = "l",
+     xlab = "Date",
+     ylab = "GPP (µmol m^-2 s^-1)",
+     col = "cornflowerblue",
+     main = "GPP with Phenophase Transitions at Bartlett")
+
+# Add vertical lines for rising and falling phenophase transitions from dfBart
+
+# Convert numeric transition dates to Date format (assuming origin "1970-01-01")
+rising_transition_50 <- as.Date(phenology_dates$rising$transition_50, origin = "1970-01-01")
+falling_transition_50 <- as.Date(phenology_dates$falling$transition_50, origin = "1970-01-01")
+
+rising_transition_10 <- as.Date(phenology_dates$rising$transition_10, origin = "1970-01-01")
+falling_transition_10 <- as.Date(phenology_dates$falling$transition_10, origin = "1970-01-01")
+
+rising_transition_25 <- as.Date(phenology_dates$rising$transition_25, origin = "1970-01-01")
+falling_transition_25 <- as.Date(phenology_dates$falling$transition_25, origin = "1970-01-01")
+
+# Rising (spring green-up) transition 50%
+abline(v = rising_transition_50, col = "forestgreen", lwd = 1)
+
+# Falling (autumn senescence) transition 50%
+abline(v = falling_transition_50, col = "brown4", lwd = 1)
+
+abline(v = rising_transition_10, col = "lightgreen", lwd = 1)
+
+# Falling (autumn senescence) transition 50%
+abline(v = falling_transition_10, col = "chocolate", lwd = 1)
+
+
+abline(v = rising_transition_25, col = "green", lwd = 1)
+
+# Falling (autumn senescence) transition 50%
+abline(v = falling_transition_25, col = "chocolate4", lwd = 1)
 ```
 
 ------------------------------------------------------------------------
