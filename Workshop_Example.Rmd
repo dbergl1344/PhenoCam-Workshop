@@ -44,7 +44,7 @@ We will start by introducing essential skills and tools for extracting PhenoCam 
 
 Each PhenoCam site includes specific metadata, such as the site setup, location, vegetation type, and climate regime.
 
-Each PhenoCam site may have one or more Regions of Interest (ROIs) for each vegetation type. These will have different ROI IDs (i.e. 1000, 1001, 1002). The packages we will use today allow us to interact with the PhenoCam server to extract data and process it within an R environment.
+Each PhenoCam site may have one or more Regions of Interest (ROIs) for each vegetation type. These will have different ROI IDs (i.e. 1000, 2000, 3000). The packages we will use today allow us to interact with the PhenoCam server to extract data and process it within an R environment.
 
 ```{r libraries}
 library(data.table)
