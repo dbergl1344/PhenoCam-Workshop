@@ -22,17 +22,13 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-This interactive part of the workshop will walk us through interacting
-with the PhenoCam Server using the phenocamapi and phenocamr R packages.
-You will how to extract PhenoCam data and about the post-processing of
-PhenoCam data. This code was adopted from code by Bijan Seyednasrollah
-and Koen Hufkens.
+This interactive part of the workshop will walk us through interacting with the PhenoCam Server using the phenocamapi and phenocamr R packages.
+
+You will how to extract PhenoCam data and about the post-processing of PhenoCam data. This code was adapted from code by Bijan Seyednasrollah and Koen Hufkens.
 
 ------------------------------------------------------------------------
 
-We will start by introducing essential skills and tools for extracting
-PhenoCam data directly from the server. The objectives of this section
-of the workshop are to:
+We will start by introducing essential skills and tools for extracting PhenoCam data directly from the server. The objectives of this section of the workshop are to:
 
 -   Examine PhenoCam metadata
 
@@ -46,14 +42,9 @@ of the workshop are to:
 
 ## Exploring PhenoCam metadata
 
-Each PhenoCam site includes specific metadata, such as the site setup,
-location, vegetation type, and climate regime.
+Each PhenoCam site includes specific metadata, such as the site setup, location, vegetation type, and climate regime.
 
-Each PhenoCam site may have one or more Regions of Interest (ROIs) for
-each vegetation type. These will have different ROI IDs (i.e. 1000,
-1001, 1002). The packages we will use today allow us to interact with
-the PhenoCam server to extract data and process it within an R
-environment.
+Each PhenoCam site may have one or more Regions of Interest (ROIs) for each vegetation type. These will have different ROI IDs (i.e. 1000, 1001, 1002). The packages we will use today allow us to interact with the PhenoCam server to extract data and process it within an R environment.
 
 ```{r libraries}
 library(data.table)
@@ -66,11 +57,8 @@ library(plotly)
 library(gridExtra)
 ```
 
-We can retrieve an up-to-date data.frame containing metadata for the
-entire PhenoCam network using the get_phenos() function. This will The
-returned value will be a data.table to facilitate further data
-exploration. This function connect directly to the PhenoCam API to
-retrive the latest metadata for all sites of the PhenoCam network.
+We can retrieve an up-to-date data.frame containing metadata for the entire PhenoCam network using the get_phenos() function. This will The returned value will be a data.table to facilitate further data
+exploration. This function connect directly to the PhenoCam API to retrieve the latest metadata for all sites of the PhenoCam network.
 
 ```{r obtain-data, fig.height=5, fig.width=8, message=FALSE}
 # Fetch the latest metadata for PhenoCam sites, returned as a data.table for easy manipulation
@@ -83,17 +71,11 @@ head(phenosCurrent$site)
 colnames(phenosCurrent)
 ```
 
-Now we have a better idea of the types of metadata that are available
-for the Phenocams.
+Now we have a better idea of the types of metadata that are available for the Phenocams.
 
 ### Remove null values
 
-Before focusing on specific locations, we may want to examine some
-patterns in the metadata. Let's explore Mean Annual Precipitation (MAP)
-and Mean Annual Temperature (MAT) across the various field sites,
-grouping them by the primary vegetation type (primary_veg_type) at each
-site. To proceed, we first need to identify the abbreviations used by
-the upcoming functions, as shown in the table below.
+Before focusing on specific locations, we may want to examine some patterns in the metadata. Let's explore Mean Annual Precipitation (MAP) and Mean Annual Temperature (MAT) across the various field sites, grouping them by the primary vegetation type (primary_veg_type) at each site. To proceed, we first need to identify the abbreviations used by the upcoming functions, as shown in the table below.
 
 | Abbreviation |                     Description                     |     |
 |--------------|:---------------------------------------------------:|----:|
@@ -111,8 +93,7 @@ the upcoming functions, as shown in the table below.
 | RF           |                   reference panel                   |     |
 | XX           |                     unspecified                     |     |
 
-First, we want to remove the sites where there is not MAP and MAT as
-part of the metadata, and then plot the data.
+First, we want to remove the sites where there is not MAP and MAT as part of the metadata, and then plot the data.
 
 ```{r plot-MAT-MAP, message=FALSE, fig.height=8, fig.width=8}
 # #Some sites do not have data on Mean Annual Precipitation (MAP) and Mean Annual Temperature (MAT).
@@ -142,14 +123,11 @@ ggplot(phenosCurrent, aes(x = MAT_worldclim, y = MAP_worldclim, color = primary_
 
 ## PhenoCam time series
 
-PhenoCam time series consist of data extracted from Regions of Interest
-(ROIs) at a specific site. The first step is to obtain the ROIs.
+PhenoCam time series consist of data extracted from Regions of Interest (ROIs) at a specific site. The first step is to obtain the ROIs.
 
 ### Obtain ROIs
 
-To download the phenological time series from PhenoCam, we need the site
-name, vegetation type, and ROI ID. This information can be retrieved
-from each PhenoCam site using the get_rois() function from the
+To download the phenological time series from PhenoCam, we need the site name, vegetation type, and ROI ID. This information can be retrieved from each PhenoCam site using the get_rois() function from the
 phenocamapi package.
 
 ```{r get-rois, fig.height=5, fig.width=6.5, message=FALSE}
@@ -166,12 +144,8 @@ head(PhenoCamROIs$roi_name)
 
 ### Download time series
 
-Now that we have our ROI data frame, we can use the `get_pheno_ts()`
-function to download a time series of our site within that region of
-interest and return the result as a `data.table`. We will work with the
-Kemp Natural Resources Station in Wisconsin ('kempnrs') and the ROI ==
-1000. The primary vegetation type here is deciduous broadleaf with a
-secondary vegetation type of evergreen needleleaf.
+Now that we have our ROI data frame, we can use the `get_pheno_ts()` function to download a time series of our site within that region of interest and return the result as a `data.table`. We will work with the
+Kemp Natural Resources Station in Wisconsin ('kempnrs') and the ROI == 1000. The primary vegetation type here is deciduous broadleaf with a secondary vegetation type of evergreen needleleaf.
 
 ```{r, fig.height=5, fig.width=6.5, message=FALSE}
 # list ROIs for kempnrs
@@ -184,18 +158,13 @@ kempnrs_DB_1000 <- get_pheno_ts(site = 'kempnrs', vegType = 'DB', roiID = 1000, 
 str(kempnrs_DB_1000)
 ```
 
-We now have various data related to this ROI from the deciduous stand at
-Kemp Natural Resources Station in Wisconsin. One of these is the green
-chromatic coordinate (GCC), which measures the "greenness" of an area
+We now have various data related to this ROI from the deciduous stand at Kemp Natural Resources Station in Wisconsin. One of these is the green chromatic coordinate (GCC), which measures the "greenness" of an area
 and serves as an indicator of the green pigment in vegetation.
 
-We can use this data to track changes in GCC, or greenness, over time at
-this site. We will use gcc90, the 90th percentile GCC value, calculated
-over a 3-day moving window for the ROI. This metric captures the upper
+We can use this data to track changes in GCC, or greenness, over time at this site. We will use gcc90, the 90th percentile GCC value, calculated over a 3-day moving window for the ROI. This metric captures the upper
 range of greenness values while minimizing the influence of outliers.
 
-Before plotting gcc90, we need to adjust the dates, converting them from
-Factors to Date format to ensure accurate plotting.
+Before plotting gcc90, we need to adjust the dates, converting them from Factors to Date format to ensure accurate plotting.
 
 ```{r plot-gcc90, fig.height=5, fig.width=8}
 # Convert date variable into date format if not already done
@@ -216,11 +185,7 @@ ggplot(kempnrs_DB_1000, aes(x = date, y = gcc_90)) +
 
 ### Download midday images for a given time range
 
-Now, let's say we want to "peek" into our forest. To do this, we can
-access the midday images and download them individually. However, it is
-often more useful to download all images within a specific time range
-and a given day of a month. This can be done using the phenocamapi
-package.
+Now, let's say we want to "peek" into our forest. To do this, we can access the midday images and download them individually. However, it is often more useful to download all images within a specific time range and a given day of a month. This can be done using the phenocamapi package.
 
 ```{r midday-time-range, fig.height=6, fig.width=8, message=FALSE, eval=TRUE}
 # open a temporary directory
@@ -260,10 +225,7 @@ mtext('Seasonal variation at the Kemp Natural Resources Station in Wisconsin ', 
 
 # Connecting Flux Data to PhenoCam Data
 
-Alternatively, we may want to include only PhenoCam sites with specific
-attributes in our datasets. For instance, if we are interested in sites
-with a co-located flux tower, we can filter the metadata using the
-`flux_sitenames` attribute to select those sites.
+Alternatively, we may want to include only PhenoCam sites with specific attributes in our datasets. For instance, if we are interested in sites that also have available flux data, we can filter the metadata using the `flux_sitenames` attribute to select those sites.
 
 ```{r filter-flux, fig.height=5, fig.width=6.5, message=FALSE}
 # Create a data table only including the sites that have flux_data available and where the FLUX site name is specified
@@ -277,9 +239,7 @@ head(phenofluxsites)
 
 ```
 
-What if we're interested in PhenoCam and Flux data co-located within a
-specific vegetation type? We can do this by filtering for PhenoCam sites
-with a flux tower located in deciduous broadleaf forests
+What if we're interested in PhenoCam and Flux data co-located within a specific vegetation type? We can do this by filtering for PhenoCam sites with a flux tower located in deciduous broadleaf forests
 (`primary_veg_type == 'DB'`).
 
 ```{r filter-flux-db, fig.height=5, fig.width=6.5, message=FALSE}
@@ -294,16 +254,12 @@ head(PhenoFlux.DB)
 
 # Looking at PhenoCam and Flux Data Together
 
-Here we will merge PhenoCam and Flux data from the Bartlett Experimental
-Forest. This site has co-located PhenoCam and eddy covariance (EC) flux
-tower data. We will focus on the year 2018. If you want to repeat this,
-you will need to have already processed or downloaded Flux data, which
-can be done using packages like amerifluxR. We will download the
-PhenoCam time series data for the Bartlett site, filter it for 2018, and
-then merge it with the flux data. After merging, we will look at the
-seasonal patterns by plotting the 90th percentile Green Chromatic
-Coordinate (GCC) and Gross Primary Productivity (GPP) over time,
-followed by an interactive scatter plot to investigate the relationship
+Here we will merge PhenoCam and Flux data from the Bartlett Experimental Forest. This site has both PhenoCam data and eddy covariance (EC) flux tower data. We will focus on the year 2018. If you want to repeat this,
+you will need to have already processed or downloaded Flux data, which can be done using packages like amerifluxR. We will download the PhenoCam time series data for the Bartlett site, filter it for 2018, and
+then merge it with the flux data. 
+
+After merging, we will look at the seasonal patterns by plotting the 90th percentile Green Chromatic
+Coordinate (GCC) and Gross Primary Productivity (GPP) over time, followed by an interactive scatter plot to investigate the relationship
 between GCC and GPP.
 
 ```{r}
@@ -367,14 +323,10 @@ ggplotly(p)
 
 # Phenology Transition Dates
 
-Above we used midday images to visualize an entire growing season using
-PhenoCam imagery. But now what if we want to see if this growing season
-has been changing over time? Or track whether the start of season, end
-of season, or greeness has changed through time? We can use the
-phenocamr package to visualize this. The phenphases() function in the
-phenocamr package will extract the start of spring and end of fall
-dates. First, let's download the BERMS Southern Old Black Spruce Site
-data in Prince Albert National Park using this package.
+Above we used midday images to visualize an entire growing season using PhenoCam imagery. But now what if we want to see if this growing season has been changing over time? Or track whether the start of season, end
+of season, or greenness has changed through time?
+
+We can use the phenocamr package to visualize this. The phenphases() function in the phenocamr package will extract the start of spring and end of fall dates. First, let's download the BERMS Southern Old Black Spruce Site data in Prince Albert National Park using this package.
 
 ```{r}
  download_phenocam(site = "canadaOBS",
@@ -391,8 +343,7 @@ dfCanadaOBS <- read_phenocam(file.path(tempdir(),"canadaOBS_DN_1000_3day.csv"))
 
 # Detecting Outliers and Smoothing the Time Series
 
-Now that we have our dataframe, we will want to detect any outliers in
-our data and smooth the time series.
+Now that we have our dataframe, we will want to detect any outliers in our data and smooth the time series.
 
 ```{r}
   dfCanadaOBS <- detect_outliers(dfCanadaOBS)
@@ -401,8 +352,7 @@ our data and smooth the time series.
 
 # Calculating the Phenophases
 
-Now that the smoothed data has been made available, we can calculate and
-plot the phenological transition date.
+Now that the smoothed data has been made available, we can calculate and plot the phenological transition dates.
 
 ```{r}
 # Convert dates to Date format 
@@ -426,7 +376,7 @@ ggplot(dfCanadaOBS$data, aes(x = date, y = smooth_gcc_90)) +
 ```
 
 # Linking Flux Data and Phenophases 
-Here we use the phenophases() function to calcualte the phenophase transition dates at the Bartlett Experimental Forest to connect those phases to the flux data, namely GPP.
+Here we use the phenophases() function to calculate the phenophase transition dates at the Bartlett Experimental Forest to connect those phases to the flux data, namely GPP.
 
 We can plot GPP over time and added vertical lines marking the phenophase transitions, including the 10th, 25th, and 50th percentiles of both spring and autumn phenophases. This will show us how changes in GPP correspond to critical periods of vegetation development and senescence. This combined approach can illustrate the temporal dynamics of vegetation phenology and ecosystem function at Bartlett during the year 2018.
 
