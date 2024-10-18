@@ -386,7 +386,7 @@ data in Prince Albert National Park using this package.
                     out_dir = tempdir())
 
 #Now we need to assign a dataframe to the data that we just downloaded
-dfCanadaOBS <- read_phenocam(file.path(tempdir(),"CanadaOBS_DN_1000_3day.csv"))
+dfCanadaOBS <- read_phenocam(file.path(tempdir(),"canadaOBS_DN_1000_3day.csv"))
 ```
 
 # Detecting Outliers and Smoothing the Time Series
