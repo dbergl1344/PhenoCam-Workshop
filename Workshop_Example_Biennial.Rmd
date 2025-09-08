@@ -22,12 +22,12 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-This interactive part of the workshop will walk us through interacting
-with the PhenoCam Server using the phenocamapi and phenocamr R packages.
+This part of the workshop will walk us through interacting with the
+PhenoCam Server using the phenocamapi and phenocamr R packages.
 
-You will how to extract PhenoCam data and about the post-processing of
-PhenoCam data. This code was adapted from code by Bijan Seyednasrollah
-and Koen Hufkens.
+You will learn how to extract PhenoCam data and about the
+post-processing of PhenoCam data. This code was adapted from code by
+Bijan Seyednasrollah and Koen Hufkens.
 
 ------------------------------------------------------------------------
 
@@ -68,10 +68,10 @@ library(gridExtra)
 ```
 
 We can retrieve an up-to-date data.frame containing metadata for the
-entire PhenoCam network using the get_phenos() function. This will The
-returned value will be a data.table to facilitate further data
-exploration. This function connect directly to the PhenoCam API to
-retrieve the latest metadata for all sites of the PhenoCam network.
+entire PhenoCam network using the get_phenos() function. This will
+return a data.table to facilitate further data exploration. This
+function connects directly to the PhenoCam API to retrieve the latest
+metadata for all sites of the PhenoCam network.
 
 ```{r obtain-data, fig.height=5, fig.width=8, message=FALSE}
 # Fetch the latest metadata for PhenoCam sites, returned as a data.table for easy manipulation
@@ -185,9 +185,9 @@ kendall_GR_1000 <- get_pheno_ts(site = 'kendall', vegType = 'GR', roiID = 1000, 
 str(kendall_GR_1000)
 ```
 
-We now have various data related to this ROI from the grassland at
-Kendall site in Arizona. One of these is the green chromatic coordinate
-(GCC), which measures the "greenness" of an area and serves as an
+We now have various data related to this ROI from the Kendall grassland
+site in Arizona. One of these is the green chromatic coordinate (GCC),
+which measures the "greenness" for a region of interest and serves as an
 indicator of the green pigment in vegetation.
 
 We can use this data to track changes in GCC, or greenness, over time at
@@ -281,7 +281,7 @@ head(phenofluxsites)
 What if we're interested in PhenoCam and Flux data co-located within a
 specific vegetation type? We can do this by filtering for PhenoCam sites
 with a flux tower located in specific vegetation types
-(`primary_veg_type == 'DB'`).
+(`primary_veg_type == 'GR'`).
 
 ```{r filter-flux-db, fig.height=5, fig.width=6.5, message=FALSE}
 
@@ -298,15 +298,14 @@ Here we will merge PhenoCam and Flux data from the Heritage Land
 Conservancy, Pinyon-Juniper Site near Mountainair, NM. This site has
 both PhenoCam data and eddy covariance (EC) flux tower data. We will
 focus on the year 2018. If you want to repeat this, you will need to
-have already processed or downloaded Flux data, which can be done using
+have already processed or downloaded flux data, which can be done using
 packages like 'amerifluxR'. We will download the PhenoCam time series
 data from the site, filter it for 2018, and then merge it with the flux
 data.
 
 After merging, we will look at the seasonal patterns by plotting the
 90th percentile Green Chromatic Coordinate (GCC) and Gross Primary
-Productivity (GPP) over time, followed by an interactive scatter plot to
-investigate the relationship between GCC and GPP.
+Productivity (GPP) over time.
 
 ```{r}
 # Here we will have already needed to download Flux data that you process or that is already proccessed. You can use packages like amerifluxR to do this.
