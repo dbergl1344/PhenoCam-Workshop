@@ -85,7 +85,7 @@ will then plot their Mean Annual Precipitation (MAP) and Mean Annual
 Temperature (MAT)..
 
 [Use the table above to select the vegetation type abbreviations of
-interest.]{style="color:green"}.
+interest.]{style="color:green"}
 
 The function below accepts the abbreviations of vegetation types (such
 as 'DB' for Deciduous Broadleaf or 'DN' for Deciduous Needleleaf).

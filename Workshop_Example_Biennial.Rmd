@@ -43,18 +43,7 @@ of the workshop are to:
 
 -   Extract and plot phenophases from a selected site
 
--   Link Flux data to PhenoCam data
-
-## Exploring PhenoCam metadata
-
-Each PhenoCam site includes specific metadata, such as the site setup,
-location, vegetation type, and climate regime.
-
-Each PhenoCam site may have one or more Regions of Interest (ROIs) for
-each vegetation type. These will have different ROI IDs (i.e. 1000,
-2000, 3000). The packages we will use today allow us to interact with
-the PhenoCam server to extract data and process it within an R
-environment.
+-   Link flux data to PhenoCam data
 
 ```{r libraries}
 library(data.table)
@@ -66,6 +55,11 @@ library(ggplot2)
 library(plotly)
 library(gridExtra)
 ```
+
+## Exploring PhenoCam metadata
+
+Each PhenoCam site includes specific metadata, such as the site setup,
+location, vegetation type, and climate regime.
 
 We can retrieve an up-to-date data.frame containing metadata for the
 entire PhenoCam network using the get_phenos() function. This will
@@ -144,11 +138,16 @@ ggplot(phenosCurrent, aes(x = MAT_worldclim, y = MAP_worldclim, color = primary_
 ## PhenoCam time series
 
 PhenoCam time series consist of data extracted from Regions of Interest
-(ROIs) at a specific site. The first step is to obtain the ROIs.
+(ROIs) and each site may have one or more ROIs. These are distinguished
+by ROI IDs (e.g., 1000, 2000,3000), such as 1000_DB;2000_DB for
+deciduous broadleaf or 1000_GR; 2000_GR for grass. The packages we will
+use today allow us to interact with the PhenoCam server to extract data
+and process it within an R environment. The first step is to obtain the
+ROIs.
 
 ### Obtain ROIs
 
-To download the phenological time series from PhenoCam, we need the site
+To download a full time series from a site of interest, we need the site
 name, vegetation type, and ROI ID. This information can be retrieved
 from each PhenoCam site using the get_rois() function from the
 phenocamapi package.
@@ -168,11 +167,11 @@ head(PhenoCamROIs$roi_name)
 ### Download time series
 
 Now that we have our ROI data frame, we can use the `get_pheno_ts()`
-function to download a time series of our site within that region of
+function to download a time series of our site within a region of
 interest and return the result as a `data.table`. We will work with the
 Kendall grassland site in Arizona ('kendall') and the ROI == 1000. The
-primary vegetation type here is a grassland, with a secondary ROI '2000'
-representing shrubs.
+types = represents different levels of temporal smoothing of the Gcc
+time series, being ‘1day’ and ‘3day.'
 
 ```{r, fig.height=5, fig.width=6.5, message=FALSE}
 # list ROIs for kempnrs
@@ -186,14 +185,14 @@ str(kendall_GR_1000)
 ```
 
 We now have various data related to this ROI from the Kendall grassland
-site in Arizona. One of these is the green chromatic coordinate (GCC),
-which measures the "greenness" for a region of interest and serves as an
-indicator of the green pigment in vegetation.
+site in Arizona. One of these is the green chromatic coordinate (Gcc),
+which is an index of relative “greenness” serving as a proxy for
+vegetation activity.
 
-We can use this data to track changes in GCC, or greenness, over time at
-this site. We will use gcc90, the 90th percentile GCC value, calculated
-over a 3-day moving window for the ROI. This metric captures the upper
-range of greenness values while minimizing the influence of outliers.
+We can use this data to track changes in Gcc, or greenness, over time at
+this site. We will use gcc90, the 90th percentile Gcc value. This metric
+captures the upper range of greenness values while minimizing the
+influence of outliers.
 
 Before plotting gcc90, we need to adjust the dates, converting them from
 Factors to Date format to ensure accurate plotting.
@@ -275,7 +274,6 @@ phenofluxsites <- phenofluxsites[Flux!='']
 
 # view the first few rows of the data table
 head(phenofluxsites)
-
 ```
 
 What if we're interested in PhenoCam and Flux data co-located within a
@@ -296,16 +294,14 @@ head(PhenoFlux.multi, n = 20)
 
 Here we will merge PhenoCam and Flux data from the Heritage Land
 Conservancy, Pinyon-Juniper Site near Mountainair, NM. This site has
-both PhenoCam data and eddy covariance (EC) flux tower data. We will
-focus on the year 2018. If you want to repeat this, you will need to
-have already processed or downloaded flux data, which can be done using
-packages like 'amerifluxR'. We will download the PhenoCam time series
-data from the site, filter it for 2018, and then merge it with the flux
-data.
+both PhenoCam data and eddy covariance flux tower data. We will focus on
+the year 2018. If you want to repeat this, you will need to have already
+processed or downloaded flux data, which can be done using packages like
+'amerifluxR'. We will download the PhenoCam time series data from the
+site, filter it for 2018, and then merge it with the flux data.
 
 After merging, we will look at the seasonal patterns by plotting the
-90th percentile Green Chromatic Coordinate (GCC) and Gross Primary
-Productivity (GPP) over time.
+90th percentile Gcc and Gross Primary Productivity (GPP) over time.
 
 ```{r}
 # Here we will have already needed to download Flux data that you process or that is already proccessed. You can use packages like amerifluxR to do this.
