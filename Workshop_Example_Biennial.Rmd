@@ -22,12 +22,13 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-This part of the workshop will walk us through interacting with the
-PhenoCam Server using the phenocamapi and phenocamr R packages.
+This part of the workshop will walk us through using some of the
+software tools that are available to us to both visualize and processes
+PhenoCam data. We will be working with the R packages phenocamapi and
+phenocamr.
 
-You will learn how to extract PhenoCam data and about the
-post-processing of PhenoCam data. This code was adapted from code by
-Bijan Seyednasrollah and Koen Hufkens.
+This code was adapted from code by Bijan Seyednasrollah and Koen
+Hufkens.
 
 ------------------------------------------------------------------------
 
@@ -62,8 +63,8 @@ Each PhenoCam site includes specific metadata, such as the site setup,
 location, vegetation type, and climate regime.
 
 We can retrieve an up-to-date data.frame containing metadata for the
-entire PhenoCam network using the get_phenos() function. This will
-return a data.table to facilitate further data exploration. This
+entire PhenoCam network using the **get_phenos()** function. This will
+return a **data.table** to facilitate further data exploration. This
 function connects directly to the PhenoCam API to retrieve the latest
 metadata for all sites of the PhenoCam network.
 
@@ -81,7 +82,7 @@ colnames(phenosCurrent)
 Now we have a better idea of the types of metadata that are available
 for the Phenocams.
 
-### Remove null values
+### MAP and MAT Plot Across Sites
 
 Before focusing on specific locations, we may want to examine some
 patterns in the metadata. Let's explore Mean Annual Precipitation (MAP)
@@ -105,9 +106,6 @@ the upcoming functions, as shown in the table below.
 | NV           |                    non-vegetated                    |     |
 | RF           |                   reference panel                   |     |
 | XX           |                     unspecified                     |     |
-
-First, we want to remove the sites where there is not MAP and MAT as
-part of the metadata, and then plot the data.
 
 ```{r plot-MAT-MAP, message=FALSE, fig.height=8, fig.width=8}
 # #Some sites do not have data on Mean Annual Precipitation (MAP) and Mean Annual Temperature (MAT).
@@ -140,10 +138,9 @@ ggplot(phenosCurrent, aes(x = MAT_worldclim, y = MAP_worldclim, color = primary_
 PhenoCam time series consist of data extracted from Regions of Interest
 (ROIs) and each site may have one or more ROIs. These are distinguished
 by ROI IDs (e.g., 1000, 2000,3000), such as 1000_DB;2000_DB for
-deciduous broadleaf or 1000_GR; 2000_GR for grass. The packages we will
-use today allow us to interact with the PhenoCam server to extract data
-and process it within an R environment. The first step is to obtain the
-ROIs.
+deciduous broadleaf or 1000_GR; 2000_GR for grass.
+
+The first step is to obtain the ROIs.
 
 ### Obtain ROIs
 
@@ -184,10 +181,10 @@ kendall_GR_1000 <- get_pheno_ts(site = 'kendall', vegType = 'GR', roiID = 1000, 
 str(kendall_GR_1000)
 ```
 
-We now have various data related to this ROI from the Kendall grassland
-site in Arizona. One of these is the green chromatic coordinate (Gcc),
-which is an index of relative “greenness” serving as a proxy for
-vegetation activity.
+We now have extracted data related to this ROI from the Kendall
+grassland site in Arizona. One of these is the green chromatic
+coordinate (Gcc), which is an index of relative “greenness” and serves
+as a proxy for vegetation activity.
 
 We can use this data to track changes in Gcc, or greenness, over time at
 this site. We will use gcc90, the 90th percentile Gcc value. This metric
